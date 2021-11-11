@@ -24,24 +24,32 @@ async function run() {
         // ----------Products Collection-----------
 
         //send products
-        app.get('/products', async (req, res)=>{
+        app.get('/products', async (req, res) => {
             const cursor = productsCollection.find({})
             const products = await cursor.toArray()
             console.log(products)
             res.json(products)
         });
 
+        //send a single product
+        app.get('/products/:id', async (req, res) => {
+            const id = req.query.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await productsCollection.findOne(filter);
+            res.json(result)
+        });
+
         //add product
-        app.post('/products', async(req,res)=>{
+        app.post('/products', async (req, res) => {
             const product = req.body;
             const result = await productsCollection.insertOne(product);
             res.json(result)
         });
 
         //delete product
-        app.delete('/products/:id', async(req, res)=>{
+        app.delete('/products/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: ObjectId(id)};
+            const query = { _id: ObjectId(id) };
             const result = await productsCollection.deleteOne(query);
             res.json(result);
         });
