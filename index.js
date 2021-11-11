@@ -3,6 +3,7 @@ const app = express()
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
 const port = process.env.PORT || 5000
 
 app.use(cors());
@@ -18,6 +19,34 @@ async function run() {
 
         const database = client.db("twelfthAssignmentDb");
         const usersCollection = database.collection("users");
+        const productsCollection = database.collection("products")
+
+        // ----------Products Collection-----------
+
+        //send products
+        app.get('/products', async (req, res)=>{
+            const cursor = productsCollection.find({})
+            const products = await cursor.toArray()
+            console.log(products)
+            res.json(products)
+        });
+
+        //add product
+        app.post('/products', async(req,res)=>{
+            const product = req.body;
+            const result = await productsCollection.insertOne(product);
+            res.json(result)
+        });
+
+        //delete product
+        app.delete('/products/:id', async(req, res)=>{
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await productsCollection.deleteOne(query);
+            res.json(result);
+        });
+
+        //----------Users Collection---------------
 
         //find an admin
         app.get('/users/:email', async (req, res) => {
