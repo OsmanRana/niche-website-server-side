@@ -20,15 +20,15 @@ async function run() {
         const database = client.db("twelfthAssignmentDb");
         const usersCollection = database.collection("users");
         const productsCollection = database.collection("products")
+        const ordersCollection = database.collection("orders")
 
         // ----------Products Collection-----------
 
         //send products
         app.get('/products', async (req, res) => {
-            const cursor = productsCollection.find({})
-            const products = await cursor.toArray()
-            console.log(products)
-            res.json(products)
+            const cursor = productsCollection.find({});
+            const products = await cursor.toArray();
+            res.json(products);
         });
 
         //send a single product
@@ -92,7 +92,46 @@ async function run() {
             const updateDoc = { $set: { role: 'admin' } };
             const result = await usersCollection.updateOne(filter, updateDoc);
             res.json(result)
+        });
+
+        //---------Orders Collection------------
+
+        //add orders
+        app.post('/orders', async (req, res) => {
+            const order = req.body;
+            const result = await ordersCollection.insertOne(order);
+            res.json(result)
+        });
+
+        //send all order
+        app.get('/orders', async (req, res) => {
+            const cursor = ordersCollection.find({});
+            const result = await cursor.toArray();
+            res.json(result);
+        });
+
+        //update order status
+        app.put('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    orderStatus: "Shipped"
+                },
+            };
+            const result = await ordersCollection.updateOne(filter, updateDoc, options);
+            res.json(result)
         })
+
+        //delete an order
+        app.delete('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await ordersCollection.deleteOne(query);
+            res.json(result);
+        });
+
 
     }
     finally {
