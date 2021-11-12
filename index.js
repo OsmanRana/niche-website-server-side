@@ -21,6 +21,7 @@ async function run() {
         const usersCollection = database.collection("users");
         const productsCollection = database.collection("products")
         const ordersCollection = database.collection("orders")
+        const reviwesCollection = database.collection("reviews")
 
         // ----------Products Collection-----------
 
@@ -112,7 +113,7 @@ async function run() {
 
         //send single order based on email
         app.get('/orders/order', async (req, res) => {
-            const email = req.query.email;            
+            const email = req.query.email;
             const query = { email: email };
             const cursor = ordersCollection.find(query)
             const result = await cursor.toArray();
@@ -141,6 +142,21 @@ async function run() {
             res.json(result);
         });
 
+        //------------Reviews Collection
+
+        //add review
+        app.post('/reviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviwesCollection.insertOne(review);
+            res.json(result);
+        });
+
+        //send reviews
+        app.get('/reviews', async (req, res) => {
+            const cursor = reviwesCollection.find({});
+            const result = await cursor.toArray();
+            res.json(result);
+        })
 
     }
     finally {
