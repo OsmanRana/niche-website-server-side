@@ -110,6 +110,15 @@ async function run() {
             res.json(result);
         });
 
+        //send single order based on email
+        app.get('/orders/order', async (req, res) => {
+            const email = req.query.email;            
+            const query = { email: email };
+            const cursor = ordersCollection.find(query)
+            const result = await cursor.toArray();
+            res.json(result);
+        });
+
         //update order status
         app.put('/orders/:id', async (req, res) => {
             const id = req.params.id;
